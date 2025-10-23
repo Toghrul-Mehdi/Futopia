@@ -12,5 +12,16 @@ namespace Futopia.UserService.Api.Controllers
         {
             return Ok("Futopia User Service is running...");
         }
+
+        [HttpGet("{id}")]
+        public IActionResult Get(int? id)
+        {
+            if (id.HasValue)
+                return Ok($"Futopia - {id.Value}");
+            else
+                return Ok("Futopia User Service is running...");
+        }
+
+
     }
 }

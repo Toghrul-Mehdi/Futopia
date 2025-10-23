@@ -1,4 +1,7 @@
 ﻿using System.Text;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Futopia.ApiGateway
 {
@@ -38,16 +41,14 @@ namespace Futopia.ApiGateway
             app.Map("/{service}/{*path}", async (HttpContext context, IHttpClientFactory clientFactory) =>
             {
                 var client = clientFactory.CreateClient();
-                var service = context.Request.RouteValues["service"]?.ToString();
                 var path = context.Request.RouteValues["path"]?.ToString() ?? "";
 
-                var requestMessage = new HttpRequestMessage();
-                requestMessage.Method = new HttpMethod(context.Request.Method);
-                // HTTPS portunu istifadə et
-                requestMessage.RequestUri = new Uri($"https://localhost:7198/{path}{context.Request.QueryString}");
-                //HTTP portunu istifadə et
-                requestMessage.RequestUri = new Uri($"http://localhost:5125/{path}{context.Request.QueryString}");
-
+                var requestMessage = new HttpRequestMessage
+                {
+                    Method = new HttpMethod(context.Request.Method),
+                    // HTTPS portunu istifadə edirik
+                    RequestUri = new Uri($"https://localhost:7198/{path}{context.Request.QueryString}")
+                };
 
                 // Body varsa oxu və əlavə et
                 if (context.Request.ContentLength > 0)
