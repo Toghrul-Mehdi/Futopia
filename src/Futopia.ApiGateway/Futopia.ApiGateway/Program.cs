@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text;
 
 namespace Futopia.ApiGateway
 {
@@ -15,10 +13,20 @@ namespace Futopia.ApiGateway
             builder.Services.AddHttpClient(); // Microservice çağırışları üçün HttpClient
             builder.Services.AddHealthChecks(); // Health check əlavə et
 
+            // CORS əlavə et (frontend sorğular üçün)
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+            });
+
             var app = builder.Build();
 
-            // Middleware-lər (gələcəkdə əlavə ediləcək)
+            // Middleware-lər
             app.UseRouting();
+            app.UseCors();
 
             // Health check endpoint
             app.MapHealthChecks("/health");
@@ -26,15 +34,40 @@ namespace Futopia.ApiGateway
             // Default route
             app.MapGet("/", () => "Futopia API Gateway is running!");
 
-            // Placeholder microservice proxy route nümunəsi
-            app.MapGet("/user-service/{*path}", async (HttpContext context, IHttpClientFactory clientFactory) =>
+            // Universal proxy route (GET, POST, PUT, DELETE)
+            app.Map("/{service}/{*path}", async (HttpContext context, IHttpClientFactory clientFactory) =>
             {
                 var client = clientFactory.CreateClient();
-                var path = context.Request.Path.ToString().Replace("/user-service", "");
-                var query = context.Request.QueryString.ToString();
-                var response = await client.GetAsync($"http://localhost:5001{path}{query}"); // user service URL
-                var content = await response.Content.ReadAsStringAsync();
-                return Results.Content(content, "application/json");
+                var service = context.Request.RouteValues["service"]?.ToString();
+                var path = context.Request.RouteValues["path"]?.ToString() ?? "";
+
+                var requestMessage = new HttpRequestMessage();
+                requestMessage.Method = new HttpMethod(context.Request.Method);
+                // HTTPS portunu istifadə et
+                requestMessage.RequestUri = new Uri($"https://localhost:7198/{path}{context.Request.QueryString}");
+                //HTTP portunu istifadə et
+                requestMessage.RequestUri = new Uri($"http://localhost:5125/{path}{context.Request.QueryString}");
+
+
+                // Body varsa oxu və əlavə et
+                if (context.Request.ContentLength > 0)
+                {
+                    using var reader = new StreamReader(context.Request.Body);
+                    var body = await reader.ReadToEndAsync();
+                    requestMessage.Content = new StringContent(body, Encoding.UTF8, context.Request.ContentType);
+                }
+
+                // Authorization header varsa əlavə et
+                if (context.Request.Headers.ContainsKey("Authorization"))
+                {
+                    requestMessage.Headers.Add("Authorization", context.Request.Headers["Authorization"].ToString());
+                }
+
+                var response = await client.SendAsync(requestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                context.Response.StatusCode = (int)response.StatusCode;
+                await context.Response.WriteAsync(responseContent);
             });
 
             app.Run();
