@@ -1,0 +1,98 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2C8142F0-0079-4919-B6FB-5BC1C14B6BFB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.ApiGateway", "Futopia.ApiGateway", "{8796E31B-FA20-4394-981A-66272C746203}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.BookingService", "Futopia.BookingService", "{E8F94180-DB3B-4A4F-BF33-AE6144D81999}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.StadiumService", "Futopia.StadiumService", "{07C38BA4-CFF0-44FC-8D1D-52696B140C50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.UserService", "Futopia.UserService", "{C0CD7016-0282-48D6-BCB3-61EB0DF54904}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.UserService.Core", "Futopia.UserService.Core", "{B730AD2B-753A-4AF2-B1F2-218B9122B6EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.UserService.Infrastructure", "Futopia.UserService.Infrastructure", "{454B5581-348C-4497-82BA-CD4FE658E070}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.UserService.Presentation", "Futopia.UserService.Presentation", "{B5253506-16E3-4299-B3E9-F9BA7E12947A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.UserService.Tests", "Futopia.UserService.Tests", "{0C35F833-6896-4EC8-8822-FE8982DA3027}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.StadiumService.Core", "Futopia.StadiumService.Core", "{30A655C4-B682-4E69-9407-A7538BB8AEA4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.StadiumService.Infrastructure", "Futopia.StadiumService.Infrastructure", "{F88C4E7C-184D-43CD-A5C5-98EE299E20D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.StadiumService.Presentation", "Futopia.StadiumService.Presentation", "{617FB23E-BB48-4E36-8636-DB7C87865D38}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Futopia.StadiumService.Tests", "Futopia.StadiumService.Tests", "{E152358E-567B-4B57-9989-D00AAA6201A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futopia.UserService.Domain", "src\Futopia.UserService\Futopia.UserService.Core\Futopia.UserService.Domain\Futopia.UserService.Domain.csproj", "{EB061B32-3225-4427-974D-22E965D0CE2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futopia.UserService.Application", "src\Futopia.UserService\Futopia.UserService.Core\Futopia.UserService.Application\Futopia.UserService.Application.csproj", "{375C16C0-7122-443B-BC0E-E36C7A70F10B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futopia.UserService.Infrastructure", "src\Futopia.UserService\Futopia.UserService.Infrastructure\Futopia.UserService.Infrastructure\Futopia.UserService.Infrastructure.csproj", "{60BB668F-1EB3-40C9-9FD8-79FE211B7CC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futopia.UserService.Persistence", "src\Futopia.UserService\Futopia.UserService.Infrastructure\Futopia.UserService.Persistence\Futopia.UserService.Persistence.csproj", "{1C1783F5-A6CB-453A-88BF-9EF158A1E2D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futopia.UserService.Api", "src\Futopia.UserService\Futopia.UserService.Presentation\Futopia.UserService.Api\Futopia.UserService.Api.csproj", "{FA7E5CE8-DB6B-4176-83A3-B0DBD3911344}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futopia.ApiGateway", "src\Futopia.ApiGateway\Futopia.ApiGateway\Futopia.ApiGateway.csproj", "{8A12CAEE-EED3-429B-920A-7F7718CC0A6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EB061B32-3225-4427-974D-22E965D0CE2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB061B32-3225-4427-974D-22E965D0CE2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB061B32-3225-4427-974D-22E965D0CE2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB061B32-3225-4427-974D-22E965D0CE2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{375C16C0-7122-443B-BC0E-E36C7A70F10B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{375C16C0-7122-443B-BC0E-E36C7A70F10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{375C16C0-7122-443B-BC0E-E36C7A70F10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{375C16C0-7122-443B-BC0E-E36C7A70F10B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60BB668F-1EB3-40C9-9FD8-79FE211B7CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60BB668F-1EB3-40C9-9FD8-79FE211B7CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60BB668F-1EB3-40C9-9FD8-79FE211B7CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60BB668F-1EB3-40C9-9FD8-79FE211B7CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C1783F5-A6CB-453A-88BF-9EF158A1E2D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C1783F5-A6CB-453A-88BF-9EF158A1E2D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C1783F5-A6CB-453A-88BF-9EF158A1E2D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C1783F5-A6CB-453A-88BF-9EF158A1E2D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA7E5CE8-DB6B-4176-83A3-B0DBD3911344}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA7E5CE8-DB6B-4176-83A3-B0DBD3911344}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA7E5CE8-DB6B-4176-83A3-B0DBD3911344}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA7E5CE8-DB6B-4176-83A3-B0DBD3911344}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A12CAEE-EED3-429B-920A-7F7718CC0A6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A12CAEE-EED3-429B-920A-7F7718CC0A6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A12CAEE-EED3-429B-920A-7F7718CC0A6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A12CAEE-EED3-429B-920A-7F7718CC0A6B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8796E31B-FA20-4394-981A-66272C746203} = {2C8142F0-0079-4919-B6FB-5BC1C14B6BFB}
+		{E8F94180-DB3B-4A4F-BF33-AE6144D81999} = {2C8142F0-0079-4919-B6FB-5BC1C14B6BFB}
+		{07C38BA4-CFF0-44FC-8D1D-52696B140C50} = {2C8142F0-0079-4919-B6FB-5BC1C14B6BFB}
+		{C0CD7016-0282-48D6-BCB3-61EB0DF54904} = {2C8142F0-0079-4919-B6FB-5BC1C14B6BFB}
+		{B730AD2B-753A-4AF2-B1F2-218B9122B6EE} = {C0CD7016-0282-48D6-BCB3-61EB0DF54904}
+		{454B5581-348C-4497-82BA-CD4FE658E070} = {C0CD7016-0282-48D6-BCB3-61EB0DF54904}
+		{B5253506-16E3-4299-B3E9-F9BA7E12947A} = {C0CD7016-0282-48D6-BCB3-61EB0DF54904}
+		{0C35F833-6896-4EC8-8822-FE8982DA3027} = {C0CD7016-0282-48D6-BCB3-61EB0DF54904}
+		{30A655C4-B682-4E69-9407-A7538BB8AEA4} = {07C38BA4-CFF0-44FC-8D1D-52696B140C50}
+		{F88C4E7C-184D-43CD-A5C5-98EE299E20D4} = {07C38BA4-CFF0-44FC-8D1D-52696B140C50}
+		{617FB23E-BB48-4E36-8636-DB7C87865D38} = {07C38BA4-CFF0-44FC-8D1D-52696B140C50}
+		{E152358E-567B-4B57-9989-D00AAA6201A3} = {07C38BA4-CFF0-44FC-8D1D-52696B140C50}
+		{EB061B32-3225-4427-974D-22E965D0CE2B} = {B730AD2B-753A-4AF2-B1F2-218B9122B6EE}
+		{375C16C0-7122-443B-BC0E-E36C7A70F10B} = {B730AD2B-753A-4AF2-B1F2-218B9122B6EE}
+		{60BB668F-1EB3-40C9-9FD8-79FE211B7CC0} = {454B5581-348C-4497-82BA-CD4FE658E070}
+		{1C1783F5-A6CB-453A-88BF-9EF158A1E2D9} = {454B5581-348C-4497-82BA-CD4FE658E070}
+		{FA7E5CE8-DB6B-4176-83A3-B0DBD3911344} = {B5253506-16E3-4299-B3E9-F9BA7E12947A}
+		{8A12CAEE-EED3-429B-920A-7F7718CC0A6B} = {8796E31B-FA20-4394-981A-66272C746203}
+	EndGlobalSection
+EndGlobal
