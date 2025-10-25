@@ -27,5 +27,15 @@ namespace Futopia.UserService.Api.Controllers
 
             return Ok(response);
         }
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        {
+            var response = await _authService.LoginAsync(loginDto);
+            if (response.ResponseStatusCode == ResponseStatusCode.Error)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
     }
 }

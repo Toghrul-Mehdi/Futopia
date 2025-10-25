@@ -15,9 +15,19 @@ public class AuthenticationService : IAuthenticationService
         _userManager = userManager;
         _roleManager = roleManager;
     }
-    public Task<Response> LoginAsync(LoginDto loginDto)
+    public async Task<Response> LoginAsync(LoginDto loginDto)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByEmailAsync(loginDto.Email);
+        if (user == null)
+        {
+            return new Response(ResponseStatusCode.Error, "Invalid email or password.");
+        }
+        var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+        if (!isPasswordValid)
+        {
+            return new Response(ResponseStatusCode.Error, "Invalid email or password.");
+        }        
+        return new Response(ResponseStatusCode.Success, "Login successful.");
     }
 
     public async Task<Response> RegisterAsync(RegisterDto registerDto)
