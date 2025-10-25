@@ -34,6 +34,9 @@ namespace Futopia.ApiGateway
             // Default route
             app.MapGet("/", () => "Futopia API Gateway is running!");
 
+            // Favicon üçün route əlavə et
+            app.MapGet("/favicon.ico", () => Results.NotFound());
+
             // Universal proxy route (GET, POST, PUT, DELETE)
             app.Map("/{service}/{*path}", async (HttpContext context, IHttpClientFactory clientFactory) =>
             {
