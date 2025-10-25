@@ -1,14 +1,17 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
+using Futopia.UserService.Application.Abstractions.Service;
 using Futopia.UserService.Application.DTOs.Auth;
 using Futopia.UserService.Domain.Entities;
 using Futopia.UserService.Persistence.Context;
+using Futopia.UserService.Persistence.Implementations.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Futopia.UserService.Persistence;
+
 public static class ServiceRegistration
 {
     public static void AddSQLServices(this IServiceCollection services, IConfiguration configuration)
@@ -22,10 +25,19 @@ public static class ServiceRegistration
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
     }
+
     public static IServiceCollection AddFluentValidation(this IServiceCollection services)
     {
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining(typeof(RegisterDto));
         return services;
     }
+
+    public static IServiceCollection AddServices(this IServiceCollection services)
+    {
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
+        return services;
+    }
+
+    
 }

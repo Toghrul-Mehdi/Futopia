@@ -8,12 +8,16 @@
 
   <ItemGroup>
     <Folder Include="Abstractions\Repository\" />
-    <Folder Include="MappingProfiles\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.1.0" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Futopia.UserService.Domain\Futopia.UserService.Domain.csproj" />
   </ItemGroup>
 
 </Project>

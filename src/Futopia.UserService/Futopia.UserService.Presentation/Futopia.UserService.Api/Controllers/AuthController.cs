@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Futopia.UserService.Application.Abstractions.Service;
+using Futopia.UserService.Application.DTOs.Auth;
+using Futopia.UserService.Application.ResponceObject.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Futopia.UserService.Api.Controllers
@@ -7,21 +9,23 @@ namespace Futopia.UserService.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult Get()
+        private readonly IAuthenticationService _authService;
+        public AuthController(IAuthenticationService authService)
         {
-            return Ok("Futopia User Service is running...");
+            _authService = authService;
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(int? id)
-        {
-            if (id.HasValue)
-                return Ok($"Futopia - {id.Value}");
-            else
-                return Ok("Futopia User Service is running...");
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        {           
+            var response = await _authService.RegisterAsync(registerDto);
+
+            if (response.ResponseStatusCode == ResponseStatusCode.Error)
+            {
+                return BadRequest(response);
+            }
+
+            return Ok(response);
         }
-
-
     }
 }
