@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Futopia.UserService.Core\Futopia.UserService.Application\Futopia.UserService.Application.csproj" />
+  </ItemGroup>
+
 </Project>
