@@ -1,4 +1,7 @@
-﻿using Futopia.UserService.Domain.Entities;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
+using Futopia.UserService.Application.DTOs.Auth;
+using Futopia.UserService.Domain.Entities;
 using Futopia.UserService.Persistence.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,5 +21,11 @@ public static class ServiceRegistration
         services.AddIdentity<AppUser, IdentityRole>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
+    }
+    public static IServiceCollection AddFluentValidation(this IServiceCollection services)
+    {
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining(typeof(RegisterDto));
+        return services;
     }
 }
