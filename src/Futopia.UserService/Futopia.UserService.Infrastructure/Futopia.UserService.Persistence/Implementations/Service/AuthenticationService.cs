@@ -2,36 +2,80 @@
 using Futopia.UserService.Application.Abstractions.Service;
 using Futopia.UserService.Application.Abstractions.Third_Party;
 using Futopia.UserService.Application.DTOs.Auth;
+using Futopia.UserService.Application.Options;
 using Futopia.UserService.Application.ResponceObject;
 using Futopia.UserService.Application.ResponceObject.Enums;
 using Futopia.UserService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
 namespace Futopia.UserService.Persistence.Implementations.Service;
 public class AuthenticationService : IAuthenticationService
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IEmailService _emailService;
-    public AuthenticationService(UserManager<AppUser> userManager,RoleManager<IdentityRole> roleManager,IEmailService emailService)
+    private readonly ITokenService _tokenService;
+    private readonly TokenServiceOptions _tokenServiceOptions; // <-- field əlavə edildi
+
+    public AuthenticationService(
+        UserManager<AppUser> userManager,
+        RoleManager<IdentityRole> roleManager,
+        IEmailService emailService,
+        ITokenService tokenService,
+        IOptions<TokenServiceOptions> tokenServiceOptions) // <-- options constructor-da
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _emailService = emailService;
+        _tokenService = tokenService;
+        _tokenServiceOptions = tokenServiceOptions.Value; // <-- value saxlanılır
     }
     public async Task<Response> LoginAsync(LoginDto loginDto)
     {
         var user = await _userManager.FindByEmailAsync(loginDto.Email);
         if (user == null)
-        {
             return new Response(ResponseStatusCode.Error, "Invalid email or password.");
-        }
+
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
         if (!isPasswordValid)
-        {
             return new Response(ResponseStatusCode.Error, "Invalid email or password.");
-        }        
-        return new Response(ResponseStatusCode.Success, "Login successful.");
+
+        // Claims hazırlayırıq
+        var userClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Name, user.UserName ?? "")
+    };
+
+        // Roles varsa əlavə edə bilərik
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            userClaims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        // Token yaradırıq
+        var accessToken = _tokenService.GenerateAccessToken(userClaims);
+        var refreshToken = _tokenService.GenerateRefreshToken();
+
+        // Refresh token-i istifadəçiyə DB-də saxlamaq lazım ola bilər (optional)
+
+        // Response-a tokenləri əlavə edirik
+        var responseData = new
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            ExpiresIn = _tokenServiceOptions.AccessTokenExpirationMinutes * 60 // saniyə olaraq
+        };
+
+        return new Response(ResponseStatusCode.Success, "Login successful.")
+        {
+            Data = responseData
+        };
     }
+
 
     public async Task<Response> RegisterAsync(RegisterDto registerDto)
     {
