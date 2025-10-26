@@ -1,3 +1,4 @@
+using Futopia.UserService.Infrastructure;
 using Futopia.UserService.Persistence;
 using Futopia.UserService.Persistence.Seed;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSQLServices(builder.Configuration);
 builder.Services.AddServices();
 builder.Services.AddFluentValidation();
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddCors(options =>
 {

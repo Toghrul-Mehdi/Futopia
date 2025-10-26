@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="8.8.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
@@ -18,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Futopia.UserService.Core\Futopia.UserService.Application\Futopia.UserService.Application.csproj" />
+    <ProjectReference Include="..\..\Futopia.UserService.Infrastructure\Futopia.UserService.Infrastructure\Futopia.UserService.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Futopia.UserService.Infrastructure\Futopia.UserService.Persistence\Futopia.UserService.Persistence.csproj" />
   </ItemGroup>
 
