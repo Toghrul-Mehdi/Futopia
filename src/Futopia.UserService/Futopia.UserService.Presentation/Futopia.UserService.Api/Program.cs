@@ -3,10 +3,24 @@ using Futopia.UserService.Persistence;
 using Futopia.UserService.Persistence.Seed;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
+using Serilog;
+
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10)
+    
+    .WriteTo.Seq("http://localhost:5341")
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+
+builder.Host.UseSerilog();
+
+
 builder.Services.AddSQLServices(builder.Configuration);
 builder.Services.AddServices();
 builder.Services.AddFluentValidation();
@@ -52,10 +66,14 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// =============================
 // Database seed
+// =============================
 await app.UseUserSeedAsync();
 
+// =============================
 // Middleware
+// =============================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -68,7 +86,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseCors();
-app.UseAuthentication(); // Identity middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

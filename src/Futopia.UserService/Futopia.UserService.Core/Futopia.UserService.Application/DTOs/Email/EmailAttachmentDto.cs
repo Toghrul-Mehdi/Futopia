@@ -1,5 +1,5 @@
 ﻿namespace Futopia.UserService.Application.DTOs.Email;
-public class EmailAttachment
+public class EmailAttachmentDto
 {
     public string FileName { get; set; } = string.Empty;
     public byte[] Content { get; set; } = Array.Empty<byte>();

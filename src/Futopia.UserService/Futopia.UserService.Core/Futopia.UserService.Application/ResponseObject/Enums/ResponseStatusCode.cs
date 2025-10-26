@@ -13,5 +13,6 @@ public enum ResponseStatusCode
     Conflict = 7,
     Created = 8,
     NoContent = 9,
-    EmailNotConfirmed = 10
+    EmailNotConfirmed = 10,
+    Warning = 11
 }
