@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Futopia.UserService.Application.Abstractions.Service;
+using Futopia.UserService.Application.Abstractions.Third_Party;
 using Futopia.UserService.Application.DTOs.Auth;
 using Futopia.UserService.Application.ResponceObject;
 using Futopia.UserService.Application.ResponceObject.Enums;
@@ -10,10 +11,12 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public AuthenticationService(UserManager<AppUser> userManager,RoleManager<IdentityRole> roleManager)
+    private readonly IEmailService _emailService;
+    public AuthenticationService(UserManager<AppUser> userManager,RoleManager<IdentityRole> roleManager,IEmailService emailService)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _emailService = emailService;
     }
     public async Task<Response> LoginAsync(LoginDto loginDto)
     {
@@ -68,6 +71,8 @@ public class AuthenticationService : IAuthenticationService
         }
 
         await _userManager.AddToRoleAsync(user, "User");
+
+        await _emailService.SendEmailAsync(user.Email, "Welcome to Futopia", "Thank you for registering!",true);
 
         return new Response(ResponseStatusCode.Success, "User registered successfully.");
     }
