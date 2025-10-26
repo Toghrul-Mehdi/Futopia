@@ -12,6 +12,8 @@ public static class ServiceRegistration
     {
         services.Configure<TokenServiceOptions>(configuration.GetSection("TokenServiceOptions"));
         services.AddScoped<ITokenService, TokenService>();
+        services.Configure<EmailServiceOptions>(configuration.GetSection("EmailServiceOptions"));
+        services.AddScoped<IEmailService, EmailService>();
         return services;
     }
 }
