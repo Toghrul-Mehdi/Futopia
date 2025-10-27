@@ -7,6 +7,7 @@ using Futopia.UserService.Application.ResponceObject;
 using Futopia.UserService.Application.ResponceObject.Enums;
 using Futopia.UserService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 namespace Futopia.UserService.Persistence.Implementations.Service;
@@ -16,20 +17,23 @@ public class AuthenticationService : IAuthenticationService
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IEmailService _emailService;
     private readonly ITokenService _tokenService;
-    private readonly TokenServiceOptions _tokenServiceOptions; // <-- field əlavə edildi
+    private readonly TokenServiceOptions _tokenServiceOptions;
+    private readonly IMemoryCache _cache;
 
     public AuthenticationService(
         UserManager<AppUser> userManager,
         RoleManager<IdentityRole> roleManager,
         IEmailService emailService,
         ITokenService tokenService,
-        IOptions<TokenServiceOptions> tokenServiceOptions) // <-- options constructor-da
+        IOptions<TokenServiceOptions> tokenServiceOptions,
+        IMemoryCache cache) 
     {
         _userManager = userManager;
         _roleManager = roleManager;
         _emailService = emailService;
         _tokenService = tokenService;
-        _tokenServiceOptions = tokenServiceOptions.Value; // <-- value saxlanılır
+        _tokenServiceOptions = tokenServiceOptions.Value;
+        _cache = cache;
     }
     public async Task<Response> LoginAsync(LoginDto loginDto)
     {
@@ -41,6 +45,9 @@ public class AuthenticationService : IAuthenticationService
         if (!isPasswordValid)
             return new Response(ResponseStatusCode.Error, "Invalid email or password.");
 
+        if(!user.EmailConfirmed)
+            return new Response(ResponseStatusCode.Error, "Email is not confirmed.");
+
         // Claims hazırlayırıq
         var userClaims = new List<Claim>
     {
@@ -49,20 +56,16 @@ public class AuthenticationService : IAuthenticationService
         new Claim(ClaimTypes.Name, user.UserName ?? "")
     };
 
-        // Roles varsa əlavə edə bilərik
         var roles = await _userManager.GetRolesAsync(user);
         foreach (var role in roles)
         {
             userClaims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        // Token yaradırıq
         var accessToken = _tokenService.GenerateAccessToken(userClaims);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
-        // Refresh token-i istifadəçiyə DB-də saxlamaq lazım ola bilər (optional)
 
-        // Response-a tokenləri əlavə edirik
         var responseData = new
         {
             AccessToken = accessToken,
@@ -83,14 +86,10 @@ public class AuthenticationService : IAuthenticationService
             return new Response(ResponseStatusCode.Error, "You must accept the terms.");
 
         if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
-        {
             return new Response(ResponseStatusCode.Error, "Email already exists.");
-        }
 
         if (registerDto.Password != registerDto.ConfirmPassword)
-        {
             return new Response(ResponseStatusCode.Error, "Passwords do not match.");
-        }
 
         var user = new AppUser
         {
@@ -98,7 +97,8 @@ public class AuthenticationService : IAuthenticationService
             UserName = registerDto.Email,
             Email = registerDto.Email,
             NormalizedUserName = registerDto.Email.ToUpper(),
-            NormalizedEmail = registerDto.Email.ToUpper()
+            NormalizedEmail = registerDto.Email.ToUpper(),
+            EmailConfirmed = false
         };
 
         var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -110,16 +110,50 @@ public class AuthenticationService : IAuthenticationService
         }
 
         if (!await _roleManager.RoleExistsAsync("User"))
-        {
             await _roleManager.CreateAsync(new IdentityRole("User"));
-        }
 
         await _userManager.AddToRoleAsync(user, "User");
 
-        await _emailService.SendEmailAsync(user.Email, "Welcome to Futopia", "Thank you for registering!",true);
+        var verificationCode = new Random().Next(100000, 999999).ToString();
 
-        return new Response(ResponseStatusCode.Success, "User registered successfully.");
+        _cache.Set($"email_verify_{user.Email}", verificationCode, TimeSpan.FromMinutes(10));
+
+        var emailBody = $@"
+        <h3>Welcome to Futopia!</h3>
+        <p>Use the following code to verify your email address:</p>
+        <h2>{verificationCode}</h2>
+        <p>This code expires in 10 minutes.</p>
+        ";
+
+        await _emailService.SendEmailAsync(user.Email, "Verify your Futopia account", emailBody, true);
+
+        return new Response(ResponseStatusCode.Success, "Verification code sent to your email.");
     }
+
+    public async Task<Response> ConfirmEmailAsync(string email, string code)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+            return new Response(ResponseStatusCode.Error, "User not found.");
+
+        if (user.EmailConfirmed)
+            return new Response(ResponseStatusCode.Error, "Email already confirmed.");
+
+        if (!_cache.TryGetValue($"email_verify_{email}", out string? cachedCode))
+            return new Response(ResponseStatusCode.Error, "Verification code expired or not found.");
+
+        if (cachedCode != code)
+            return new Response(ResponseStatusCode.Error, "Invalid verification code.");
+
+        user.EmailConfirmed = true;
+        await _userManager.UpdateAsync(user);
+
+        _cache.Remove($"email_verify_{email}");
+
+        return new Response(ResponseStatusCode.Success, "Email confirmed successfully.");
+    }
+
+
 
 
 

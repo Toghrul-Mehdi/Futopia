@@ -5,4 +5,5 @@ public interface IAuthenticationService
 {
     Task<Response> RegisterAsync(RegisterDto registerDto);
     Task<Response> LoginAsync(LoginDto loginDto);
+    Task<Response> ConfirmEmailAsync(string email, string code);
 }

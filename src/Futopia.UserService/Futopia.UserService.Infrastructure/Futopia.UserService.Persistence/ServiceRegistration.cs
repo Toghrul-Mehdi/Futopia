@@ -36,6 +36,9 @@ public static class ServiceRegistration
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+        services.AddMemoryCache();
+
         return services;
     }
 
