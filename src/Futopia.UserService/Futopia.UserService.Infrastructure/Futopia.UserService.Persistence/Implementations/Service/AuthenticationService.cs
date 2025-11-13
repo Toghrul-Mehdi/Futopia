@@ -79,7 +79,7 @@ public class AuthenticationService : IAuthenticationService
         };
     }
 
-
+    //Register
     public async Task<Response> RegisterAsync(RegisterDto registerDto)
     {
         if (!registerDto.AcceptTerms)
@@ -129,7 +129,7 @@ public class AuthenticationService : IAuthenticationService
 
         return new Response(ResponseStatusCode.Success, "Verification code sent to your email.");
     }
-
+    //Email dogrualama
     public async Task<Response> ConfirmEmailAsync(string email, string code)
     {
         var user = await _userManager.FindByEmailAsync(email);
