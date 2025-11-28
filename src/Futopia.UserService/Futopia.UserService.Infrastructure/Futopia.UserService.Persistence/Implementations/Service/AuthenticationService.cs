@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Futopia.UserService.Application.Abstractions.Service;
+﻿using Futopia.UserService.Application.Abstractions.Service;
 using Futopia.UserService.Application.Abstractions.Third_Party;
 using Futopia.UserService.Application.DTOs.Auth;
 using Futopia.UserService.Application.Options;
-using Futopia.UserService.Application.ResponceObject;
 using Futopia.UserService.Application.ResponceObject.Enums;
 using Futopia.UserService.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
