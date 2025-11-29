@@ -66,14 +66,10 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// =============================
 // Database seed
-// =============================
 await app.UseUserSeedAsync();
 
-// =============================
 // Middleware
-// =============================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
