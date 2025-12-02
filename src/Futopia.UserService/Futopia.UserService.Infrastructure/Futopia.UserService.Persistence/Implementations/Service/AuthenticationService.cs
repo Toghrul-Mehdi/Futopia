@@ -17,6 +17,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly ITokenService _tokenService;
     private readonly TokenServiceOptions _tokenServiceOptions;
     private readonly IMemoryCache _cache;
+    private readonly IFirebaseSmsService _firebaseSmsService;
 
     public AuthenticationService(
         UserManager<AppUser> userManager,
@@ -24,7 +25,8 @@ public class AuthenticationService : IAuthenticationService
         IEmailService emailService,
         ITokenService tokenService,
         IOptions<TokenServiceOptions> tokenServiceOptions,
-        IMemoryCache cache) 
+        IMemoryCache cache,
+        IFirebaseSmsService firebaseSmsService) 
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -32,6 +34,7 @@ public class AuthenticationService : IAuthenticationService
         _tokenService = tokenService;
         _tokenServiceOptions = tokenServiceOptions.Value;
         _cache = cache;
+        _firebaseSmsService = firebaseSmsService;
     }
     public async Task<Response> LoginAsync(LoginDto loginDto)
     {
@@ -151,8 +154,21 @@ public class AuthenticationService : IAuthenticationService
         return new Response(ResponseStatusCode.Success, "Email confirmed successfully.");
     }
 
+    public async Task<Response> SendOtpCodeAsync(string phoneNumber)
+    {        
+        if (string.IsNullOrWhiteSpace(phoneNumber))
+        {
+            return new Response(ResponseStatusCode.Error, "Phone number cannot be empty.");
+        }      
+        var response = await _firebaseSmsService.SendOtpAsync(phoneNumber);
 
-
-
-
+        if (response.ResponseStatusCode != ResponseStatusCode.Success)
+        {
+            return response;
+        }        
+        return new Response(ResponseStatusCode.Success, "Verification code sending initiated.")
+        {
+            Data = response.Data 
+        };
+    }
 }
