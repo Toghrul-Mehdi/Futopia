@@ -18,7 +18,6 @@ public class AuthenticationService : IAuthenticationService
     private readonly TokenServiceOptions _tokenServiceOptions;
     private readonly IMemoryCache _cache;
     private readonly IFirebaseSmsService _firebaseSmsService;
-
     public AuthenticationService(
         UserManager<AppUser> userManager,
         RoleManager<IdentityRole> roleManager,
@@ -62,10 +61,8 @@ public class AuthenticationService : IAuthenticationService
         {
             userClaims.Add(new Claim(ClaimTypes.Role, role));
         }
-
         var accessToken = _tokenService.GenerateAccessToken(userClaims);
         var refreshToken = _tokenService.GenerateRefreshToken();
-
 
         var responseData = new
         {
@@ -153,14 +150,13 @@ public class AuthenticationService : IAuthenticationService
 
         return new Response(ResponseStatusCode.Success, "Email confirmed successfully.");
     }
-
     public async Task<Response> SendOtpCodeAsync(string phoneNumber)
     {        
         if (string.IsNullOrWhiteSpace(phoneNumber))
         {
             return new Response(ResponseStatusCode.Error, "Phone number cannot be empty.");
         }      
-        var response = await _firebaseSmsService.SendOtpAsync(phoneNumber);
+        var response = await _firebaseSmsService.SendOtpCodeAsync(phoneNumber);
 
         if (response.ResponseStatusCode != ResponseStatusCode.Success)
         {
