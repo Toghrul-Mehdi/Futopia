@@ -6,9 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
-
 namespace Futopia.UserService.Infrastructure.Implentations.Third_Party;
-
 public class EmailService : IEmailService
 {
     private readonly EmailServiceOptions _options;
