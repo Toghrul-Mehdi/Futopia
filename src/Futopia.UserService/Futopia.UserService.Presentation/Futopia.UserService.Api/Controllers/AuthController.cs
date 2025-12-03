@@ -2,7 +2,6 @@
 using Futopia.UserService.Application.DTOs.Auth;
 using Futopia.UserService.Application.ResponceObject.Enums;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Futopia.UserService.Api.Controllers
 {
     [Route("api/[controller]")]
