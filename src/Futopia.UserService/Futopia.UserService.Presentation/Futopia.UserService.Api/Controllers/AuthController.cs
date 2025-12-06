@@ -46,5 +46,15 @@ namespace Futopia.UserService.Api.Controllers
             }
             return Ok(response);
         }
+        [HttpPost("Send-OTP")]
+        public async Task<IActionResult> SendOtp(string phonenumber)
+        {
+            var response = await _authService.SendOtpCodeAsync(phonenumber);
+            if (response.ResponseStatusCode == ResponseStatusCode.Error)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
     }
 }
