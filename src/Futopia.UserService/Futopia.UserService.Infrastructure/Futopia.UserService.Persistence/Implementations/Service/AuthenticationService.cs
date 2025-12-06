@@ -152,19 +152,14 @@ public class AuthenticationService : IAuthenticationService
     }
     public async Task<Response> SendOtpCodeAsync(string phoneNumber)
     {        
-        if (string.IsNullOrWhiteSpace(phoneNumber))
-        {
-            return new Response(ResponseStatusCode.Error, "Phone number cannot be empty.");
-        }      
         var response = await _firebaseSmsService.SendOtpCodeAsync(phoneNumber);
-
-        if (response.ResponseStatusCode != ResponseStatusCode.Success)
+        if (response.ResponseStatusCode==ResponseStatusCode.Success)
         {
-            return response;
-        }        
-        return new Response(ResponseStatusCode.Success, "Verification code sending initiated.")
+            return new Response(ResponseStatusCode.Success, "OTP code sent successfully.");
+        }
+        else
         {
-            Data = response.Data 
-        };
+            return new Response(ResponseStatusCode.Error, "Failed to send OTP code.");
+        }
     }
 }
