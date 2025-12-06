@@ -59,7 +59,7 @@ Monitor payments and system logs
 
 The platform is built using Onion Architecture + CQRS:
 
-Frontend: ASP.NET MVC
+Frontend: React
 
 Backend: ASP.NET Web API
 
