@@ -80,25 +80,31 @@ public class AuthenticationService : IAuthenticationService
     //Register
     public async Task<Response> RegisterAsync(RegisterDto registerDto)
     {
+        // 1. Validasiyalar
         if (!registerDto.AcceptTerms)
             return new Response(ResponseStatusCode.Error, "You must accept the terms.");
 
+        // E-poçt yoxlanışı
         if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
-            return new Response(ResponseStatusCode.Error, "Email already exists.");
+            return new Response(ResponseStatusCode.Error, "Email already exists.");        
 
         if (registerDto.Password != registerDto.ConfirmPassword)
             return new Response(ResponseStatusCode.Error, "Passwords do not match.");
 
+        // 2. İstifadəçi Obyektinin Yaradılması
         var user = new AppUser
         {
             FullName = $"{registerDto.Name} {registerDto.Surname}",
-            UserName = registerDto.Email,
+            UserName = registerDto.Email, // Login üçün email istifadə olunur
             Email = registerDto.Email,
+            PhoneNumber = registerDto.Phone, // ⬅️ Telefon nömrəsi mənimsədildi
             NormalizedUserName = registerDto.Email.ToUpper(),
             NormalizedEmail = registerDto.Email.ToUpper(),
-            EmailConfirmed = false
+            EmailConfirmed = false,
+            PhoneNumberConfirmed = false // ⬅️ Hələ təsdiqlənməyib
         };
 
+        // 3. Bazaya Yazılması
         var result = await _userManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded)
@@ -107,25 +113,47 @@ public class AuthenticationService : IAuthenticationService
             return new Response(ResponseStatusCode.Error, $"User creation failed: {errors}");
         }
 
+        // 4. Rolun Təyin Edilməsi
         if (!await _roleManager.RoleExistsAsync("User"))
             await _roleManager.CreateAsync(new IdentityRole("User"));
 
-        await _userManager.AddToRoleAsync(user, "User");
+        await _userManager.AddToRoleAsync(user, "User");        
+        var smsResponse = await _firebaseSmsService.SendOtpCodeAsync(user.PhoneNumber);
 
-        var verificationCode = new Random().Next(100000, 999999).ToString();
+        if (smsResponse.ResponseStatusCode != ResponseStatusCode.Success)
+        {            
+            return new Response(ResponseStatusCode.Error, $"User created, but SMS failed: {smsResponse.Message}");
+        }
 
-        _cache.Set($"email_verify_{user.Email}", verificationCode, TimeSpan.FromMinutes(10));
+        return new Response(ResponseStatusCode.Success, "Registration successful. OTP code sent to your phone.");
+    }
 
-        var emailBody = $@"
-        <h3>Welcome to Futopia!</h3>
-        <p>Use the following code to verify your email address:</p>
-        <h2>{verificationCode}</h2>
-        <p>This code expires in 10 minutes.</p>
-        ";
+  
+    public async Task<Response> VerifyMobileAsync(VerifyNumberDto verifyDto)
+    {      
 
-        await _emailService.SendEmailAsync(user.Email, "Verify your Futopia account", emailBody, true);
+        var user = _userManager.Users.FirstOrDefault(u => u.PhoneNumber == verifyDto.PhoneNumber);
 
-        return new Response(ResponseStatusCode.Success, "Verification code sent to your email.");
+        if (user == null)
+            return new Response(ResponseStatusCode.Error, "User with this phone number not found.");
+
+        if (user.PhoneNumberConfirmed)
+            return new Response(ResponseStatusCode.Success, "Phone number is already confirmed.");
+
+        var verifyResponse = await _firebaseSmsService.VerifyOtpCodeAsync(verifyDto.PhoneNumber, verifyDto.OtpCode);
+
+        if (verifyResponse.ResponseStatusCode != ResponseStatusCode.Success)
+        {
+            return verifyResponse;
+        }
+
+        user.PhoneNumberConfirmed = true;
+        var updateResult = await _userManager.UpdateAsync(user);
+
+        if (!updateResult.Succeeded)
+            return new Response(ResponseStatusCode.Error, "Database update failed.");
+
+        return new Response(ResponseStatusCode.Success, "Phone number verified successfully.");
     }
     //Email dogrualama
     public async Task<Response> ConfirmEmailAsync(string email, string code)
@@ -149,17 +177,5 @@ public class AuthenticationService : IAuthenticationService
         _cache.Remove($"email_verify_{email}");
 
         return new Response(ResponseStatusCode.Success, "Email confirmed successfully.");
-    }
-    public async Task<Response> SendOtpCodeAsync(string phoneNumber)
-    {        
-        var response = await _firebaseSmsService.SendOtpCodeAsync(phoneNumber);
-        if (response.ResponseStatusCode==ResponseStatusCode.Success)
-        {
-            return new Response(ResponseStatusCode.Success, "OTP code sent successfully.");
-        }
-        else
-        {
-            return new Response(ResponseStatusCode.Error, "Failed to send OTP code.");
-        }
-    }
+    }    
 }
