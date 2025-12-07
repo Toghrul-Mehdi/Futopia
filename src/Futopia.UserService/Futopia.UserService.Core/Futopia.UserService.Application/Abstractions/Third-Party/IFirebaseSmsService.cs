@@ -2,4 +2,5 @@
 public interface IFirebaseSmsService
 {
     Task<Response> SendOtpCodeAsync(string phoneNumber);
+    Task<Response> VerifyOtpCodeAsync(string phoneNumber, string otpCode);
 }
