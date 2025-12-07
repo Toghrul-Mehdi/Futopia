@@ -1,15 +1,12 @@
 ﻿using Futopia.UserService.Application.Abstractions.Third_Party;
 using Futopia.UserService.Application.DTOs.Email;
 using Futopia.UserService.Application.Options;
+using Futopia.UserService.Application.ResponceObject.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Net.Mail;
 using System.Net;
-using Futopia.UserService.Application.ResponceObject.Enums;
-using Futopia.UserService.Application.ResponceObject;
-
+using System.Net.Mail;
 namespace Futopia.UserService.Infrastructure.Implentations.Third_Party;
-
 public class EmailService : IEmailService
 {
     private readonly EmailServiceOptions _options;

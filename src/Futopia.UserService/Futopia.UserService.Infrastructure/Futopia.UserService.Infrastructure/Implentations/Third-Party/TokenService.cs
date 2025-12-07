@@ -19,7 +19,6 @@ public class TokenService : ITokenService
 
         ValidateOptions();
     }
-
     public string GenerateAccessToken(IEnumerable<Claim> claims)
     {
         if (claims == null || !claims.Any())
