@@ -16,7 +16,7 @@ namespace Futopia.UserService.Api.Controllers
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
-        {           
+        {
             var response = await _authService.RegisterAsync(registerDto);
 
             if (response.ResponseStatusCode == ResponseStatusCode.Error)
@@ -46,10 +46,10 @@ namespace Futopia.UserService.Api.Controllers
             }
             return Ok(response);
         }
-        [HttpPost("Send-OTP")]
-        public async Task<IActionResult> SendOtp(string phonenumber)
+        [HttpPost("Verify-OTP")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyNumberDto verifyDto)
         {
-            var response = await _authService.SendOtpCodeAsync(phonenumber);
+            var response = await _authService.VerifyMobileAsync(verifyDto);
             if (response.ResponseStatusCode == ResponseStatusCode.Error)
             {
                 return BadRequest(response);
