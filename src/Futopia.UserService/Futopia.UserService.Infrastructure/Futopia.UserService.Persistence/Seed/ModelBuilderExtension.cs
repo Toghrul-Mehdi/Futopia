@@ -3,7 +3,6 @@ using Futopia.UserService.Domain.Enums;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace Futopia.UserService.Persistence.Seed;
 public static class ModelBuilderExtensions
 {
@@ -30,7 +29,6 @@ public static class ModelBuilderExtensions
                 UserName = "SuperAdmin",
                 Email = "superadmin@gmail.com"
             };
-
             await userManager.CreateAsync(superadmin, "SuperAdmin123.");
             await userManager.AddToRoleAsync(superadmin, nameof(Roles.SuperAdmin));
         }
