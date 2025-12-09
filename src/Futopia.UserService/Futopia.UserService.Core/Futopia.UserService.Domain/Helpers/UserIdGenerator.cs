@@ -2,9 +2,7 @@
 public static class UserIdGenerator
 {
     private const string Alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-
     private static readonly Random _random = new Random();
-
     public static string GenerateId(int length = 8)
     {
         var chars = new char[length];
