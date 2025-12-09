@@ -11,7 +11,6 @@ public class TokenService : ITokenService
 {
     private readonly TokenServiceOptions _options;
     private readonly JwtSecurityTokenHandler _tokenHandler;
-
     public TokenService(IOptions<TokenServiceOptions> options)
     {
         _options = options.Value ?? throw new ArgumentNullException(nameof(options));
