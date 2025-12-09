@@ -11,7 +11,6 @@ public class EmailService : IEmailService
 {
     private readonly EmailServiceOptions _options;
     private readonly ILogger<EmailService> _logger;
-
     public EmailService(
         IOptions<EmailServiceOptions> options,
         ILogger<EmailService> logger)
@@ -21,7 +20,6 @@ public class EmailService : IEmailService
 
         ValidateOptions();
     }
-
     public async Task<Response> SendEmailAsync(string to, string subject, string body, bool isHtml = true)
         => await SendEmailAsync(to, subject, body, null, null, isHtml);
 
