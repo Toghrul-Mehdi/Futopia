@@ -16,7 +16,6 @@ public class ValidationFilter : IActionFilter
                     ErrorMessage = error.ErrorMessage
                 }))
                 .ToList();
-
             var response = new Response(ResponseStatusCode.ValidationError)
             {
                 Message = "Validation failed.",
