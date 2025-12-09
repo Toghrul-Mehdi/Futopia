@@ -5,4 +5,5 @@ public enum Roles
     Admin,
     User,
     Company
+
 }
