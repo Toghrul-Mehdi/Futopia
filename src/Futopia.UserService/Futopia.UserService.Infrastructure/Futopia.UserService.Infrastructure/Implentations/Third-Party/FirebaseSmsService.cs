@@ -4,9 +4,7 @@ using Futopia.UserService.Application.ResponceObject.Enums;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using RestSharp;
-
 namespace Futopia.UserService.Infrastructure.Services;
-
 public class FirebaseSmsService : IFirebaseSmsService
 {
     private readonly InfobipOptions _settings;
