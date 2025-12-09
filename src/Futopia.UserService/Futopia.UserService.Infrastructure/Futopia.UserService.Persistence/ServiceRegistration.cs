@@ -9,9 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace Futopia.UserService.Persistence;
-
 public static class ServiceRegistration
 {
     public static void AddSQLServices(this IServiceCollection services, IConfiguration configuration)
