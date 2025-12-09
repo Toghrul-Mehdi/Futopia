@@ -4,9 +4,7 @@ using Futopia.UserService.Infrastructure.Implentations.Third_Party;
 using Futopia.UserService.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace Futopia.UserService.Infrastructure;
-
 public static class ServiceRegistration
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
