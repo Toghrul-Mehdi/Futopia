@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Futopia.UserService.Application.DTOs.Auth;
-
 namespace Futopia.UserService.Application.Validators.Auth;
 public class LoginDtoValidator : AbstractValidator<LoginDto>
 {
