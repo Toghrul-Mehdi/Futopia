@@ -4,37 +4,40 @@ using Futopia.UserService.Persistence.Seed;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Serilog;
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10)
-    
     .WriteTo.Seq("http://localhost:5341")
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
-
-
 builder.Host.UseSerilog();
 
-
 builder.Services.AddSQLServices(builder.Configuration);
+builder.Services.AddRepository();
 builder.Services.AddServices();
 builder.Services.AddFluentValidation();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
 
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(
+                  "http://localhost:59316",     
+                  "http://localhost:5500",      
+                  "http://127.0.0.1:5500"       
+              )
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
-// Controllers + JSON options + Validation filter
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
@@ -51,7 +54,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 
-// Swagger
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -60,14 +63,39 @@ builder.Services.AddSwaggerGen(c =>
         Title = "Futopia UserService API",
         Version = "v1"
     });
+
+ 
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 var app = builder.Build();
 
-// Database seed
+
 await app.UseUserSeedAsync();
 
-// Middleware
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -78,10 +106,14 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+
+
+app.UseRouting(); 
+
 app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
+
+app.UseAuthentication(); 
+app.UseAuthorization(); 
 
 app.MapControllers();
 
