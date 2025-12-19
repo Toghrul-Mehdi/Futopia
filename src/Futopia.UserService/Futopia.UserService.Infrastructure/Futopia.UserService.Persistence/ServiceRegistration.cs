@@ -1,9 +1,11 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
+using Futopia.UserService.Application.Abstractions.Repository;
 using Futopia.UserService.Application.Abstractions.Service;
 using Futopia.UserService.Application.DTOs.Auth;
 using Futopia.UserService.Domain.Entities;
 using Futopia.UserService.Persistence.Context;
+using Futopia.UserService.Persistence.Implementations.Repository;
 using Futopia.UserService.Persistence.Implementations.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,11 +36,14 @@ public static class ServiceRegistration
     public static IServiceCollection AddServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-
         services.AddMemoryCache();
-
+        services.AddHttpContextAccessor();
         return services;
     }
 
-    
+    public static IServiceCollection AddRepository(this IServiceCollection services)
+    {
+        services.AddScoped<IUserRefreshTokenRepository, UserRefreshTokenRepository>();
+        return services;
+    }
 }
