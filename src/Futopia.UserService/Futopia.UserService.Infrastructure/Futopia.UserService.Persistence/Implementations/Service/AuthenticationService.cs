@@ -85,6 +85,16 @@ public class AuthenticationService : IAuthenticationService
 
         await _userRefreshTokenRepository.AddAsync(userrefreshtoken);
         await _userRefreshTokenRepository.SaveChangesAsync();
+
+        var cookieoptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = DateTime.UtcNow.AddDays(7),
+            Secure = true,
+            SameSite = SameSiteMode.Strict
+        };
+
+        _httpContextAccessor.HttpContext.Response.Cookies.Append("refreshToken", refreshToken, cookieoptions);
         
 
         var responseData = new
@@ -263,7 +273,7 @@ public class AuthenticationService : IAuthenticationService
             httpContext.Response.Cookies.Delete("refreshToken");
         }
 
-        return new Response(ResponseStatusCode.Success, "Logout successful.");
+        return new Response(ResponseStatusCode.Success, "Logout successfully.");
     }
 
 }
