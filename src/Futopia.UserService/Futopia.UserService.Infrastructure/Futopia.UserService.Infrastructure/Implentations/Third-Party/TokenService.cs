@@ -15,7 +15,6 @@ public class TokenService : ITokenService
     {
         _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         _tokenHandler = new JwtSecurityTokenHandler();
-
         ValidateOptions();
     }
     public string GenerateAccessToken(IEnumerable<Claim> claims)
