@@ -1,9 +1,11 @@
-﻿using Futopia.UserService.Application.Abstractions.Service;
+﻿using Futopia.UserService.Application.Abstractions.Repository;
+using Futopia.UserService.Application.Abstractions.Service;
 using Futopia.UserService.Application.Abstractions.Third_Party;
 using Futopia.UserService.Application.DTOs.Auth;
 using Futopia.UserService.Application.Options;
 using Futopia.UserService.Application.ResponceObject.Enums;
 using Futopia.UserService.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -18,6 +20,9 @@ public class AuthenticationService : IAuthenticationService
     private readonly TokenServiceOptions _tokenServiceOptions;
     private readonly IMemoryCache _cache;
     private readonly IFirebaseSmsService _firebaseSmsService;
+    private readonly IUserRefreshTokenRepository _userRefreshTokenRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
     public AuthenticationService(
         UserManager<AppUser> userManager,
         RoleManager<IdentityRole> roleManager,
@@ -25,7 +30,10 @@ public class AuthenticationService : IAuthenticationService
         ITokenService tokenService,
         IOptions<TokenServiceOptions> tokenServiceOptions,
         IMemoryCache cache,
-        IFirebaseSmsService firebaseSmsService) 
+        IFirebaseSmsService firebaseSmsService,
+        IUserRefreshTokenRepository userRefreshTokenRepository,
+        IHttpContextAccessor httpContextAccessor
+)
     {
         _userManager = userManager;
         _roleManager = roleManager;
@@ -34,6 +42,8 @@ public class AuthenticationService : IAuthenticationService
         _tokenServiceOptions = tokenServiceOptions.Value;
         _cache = cache;
         _firebaseSmsService = firebaseSmsService;
+        _userRefreshTokenRepository = userRefreshTokenRepository;
+        _httpContextAccessor = httpContextAccessor;
     }
     public async Task<Response> LoginAsync(LoginDto loginDto)
     {
@@ -45,8 +55,8 @@ public class AuthenticationService : IAuthenticationService
         if (!isPasswordValid)
             return new Response(ResponseStatusCode.Error, "Invalid email or password.");
 
-        if(!user.EmailConfirmed)
-            return new Response(ResponseStatusCode.Error, "Email is not confirmed.");
+        /*if(!user.EmailConfirmed)
+            return new Response(ResponseStatusCode.Error, "Email is not confirmed.");*/
 
         // Claims hazırlayırıq
         var userClaims = new List<Claim>
@@ -64,10 +74,22 @@ public class AuthenticationService : IAuthenticationService
         var accessToken = _tokenService.GenerateAccessToken(userClaims);
         var refreshToken = _tokenService.GenerateRefreshToken();
 
+        // Refresh token-i bazaya yazırıq
+
+        var userrefreshtoken = new UserRefreshToken
+        {
+            RefreshToken = refreshToken,
+            UserId = user.Id,
+            ExpiresAt = DateTime.UtcNow.AddDays(7)
+        };
+
+        await _userRefreshTokenRepository.AddAsync(userrefreshtoken);
+        await _userRefreshTokenRepository.SaveChangesAsync();
+        
+
         var responseData = new
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken,
+            AccessToken = accessToken,            
             ExpiresIn = _tokenServiceOptions.AccessTokenExpirationMinutes * 60 // saniyə olaraq
         };
 
@@ -177,5 +199,71 @@ public class AuthenticationService : IAuthenticationService
         _cache.Remove($"email_verify_{email}");
 
         return new Response(ResponseStatusCode.Success, "Email confirmed successfully.");
-    }    
+    }
+
+    public async Task<Response> RefreshTokenAsync()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null)
+            return new Response(ResponseStatusCode.Error, "Invalid request.");
+
+        if (!httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+            return new Response(ResponseStatusCode.Error, "Refresh token not found.");
+
+        var storedToken = await _userRefreshTokenRepository.GetByTokenAsync(refreshToken);
+        if (storedToken == null)
+            return new Response(ResponseStatusCode.Error, "Invalid refresh token.");
+
+        if (storedToken.ExpiresAt < DateTime.UtcNow)
+            return new Response(ResponseStatusCode.Error, "Refresh token expired.");
+
+        var user = await _userManager.FindByIdAsync(storedToken.UserId);
+        if (user == null)
+            return new Response(ResponseStatusCode.Error, "User not found.");
+
+        var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Name, user.UserName ?? "")
+    };
+
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+            claims.Add(new Claim(ClaimTypes.Role, role));
+
+        var newAccessToken = _tokenService.GenerateAccessToken(claims);
+
+        return new Response(ResponseStatusCode.Success, "Token refreshed successfully.")
+        {
+            Data = new
+            {
+                AccessToken = newAccessToken,
+                ExpiresIn = _tokenServiceOptions.AccessTokenExpirationMinutes * 60
+            }
+        };
+    }
+
+
+    public async Task<Response> LogoutAsync()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null)
+            return new Response(ResponseStatusCode.Error, "Invalid request.");
+
+        if (httpContext.Request.Cookies.TryGetValue("refreshToken", out var refreshToken))
+        {
+            var storedToken = await _userRefreshTokenRepository.GetByTokenAsync(refreshToken);
+            if (storedToken != null)
+            {
+                await _userRefreshTokenRepository.DeleteAsync(storedToken);
+                await _userRefreshTokenRepository.SaveChangesAsync();
+            }
+
+            httpContext.Response.Cookies.Delete("refreshToken");
+        }
+
+        return new Response(ResponseStatusCode.Success, "Logout successful.");
+    }
+
 }
