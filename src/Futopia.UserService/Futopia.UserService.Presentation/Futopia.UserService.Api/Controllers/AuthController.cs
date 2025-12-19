@@ -53,8 +53,7 @@ namespace Futopia.UserService.Api.Controllers
             return Ok(response);
         }
 
-        // LOGOUT
-        [Authorize]
+        // LOGOUT        
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
