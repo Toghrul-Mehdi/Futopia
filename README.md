@@ -11,7 +11,7 @@ Email verification (via JWT link)
 
 Password reset & account recovery
 
-User roles: SuperAdmin, Admin, User, Support
+User roles: SuperAdmin, Admin, User, Support,Staff
 
 🏟️ Stadium Management
 
